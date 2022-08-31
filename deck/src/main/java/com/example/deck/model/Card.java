@@ -1,29 +1,24 @@
 package com.example.deck.model;
 
-import javax.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.Table;
+
 import java.io.Serializable;
-import java.util.List;
 import java.util.UUID;
 
-@Entity
+@Table
 public class Card implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @PrimaryKeyColumn(type = PrimaryKeyType.PARTITIONED)
     private UUID uuid;
 
     private String name;
     private String suit;
     private Long deckNumber;
 
-    // Should use OneToOne in theory however there is a bug preventing for this specific implementation
-    @OneToMany(mappedBy = "card")
-    private List<Deck> deckList;
-
-    @ManyToOne
-    @JoinColumn(name = "name", referencedColumnName = "name", insertable = false, updatable = false)
-    private Value value;
+    private Long points;
 
     protected Card() {
     }
@@ -67,8 +62,12 @@ public class Card implements Serializable {
         this.deckNumber = deckNumber;
     }
 
-    public Value getValue() {
-        return this.value;
+    public Long getPoints() {
+        return points;
+    }
+
+    public void setPoints(Long points) {
+        this.points = points;
     }
 
 }
