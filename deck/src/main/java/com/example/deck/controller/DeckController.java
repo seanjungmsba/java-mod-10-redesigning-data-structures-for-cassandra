@@ -1,5 +1,11 @@
-package com.example.deck;
+package com.example.deck.controller;
 
+import com.example.deck.model.Card;
+import com.example.deck.model.Deck;
+import com.example.deck.model.Value;
+import com.example.deck.repository.CardRepository;
+import com.example.deck.repository.DeckRepository;
+import com.example.deck.repository.ValueRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +30,7 @@ public class DeckController {
 
     @GetMapping("/new")
     public String newDeck(@RequestParam(value = "decks", defaultValue = "1") Long decks) {
+        
         // Drop tables and start new
         deckRepository.deleteAll();
         cardRepository.deleteAll();

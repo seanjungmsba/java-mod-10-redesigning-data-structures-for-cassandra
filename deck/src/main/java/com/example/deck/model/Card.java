@@ -1,4 +1,4 @@
-package com.example.deck;
+package com.example.deck.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -8,7 +8,7 @@ import java.util.UUID;
 @Entity
 public class Card implements Serializable {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private UUID uuid;
@@ -17,15 +17,16 @@ public class Card implements Serializable {
     private String suit;
     private Long deckNumber;
 
-    // Should use OneToOne in theory. There is a bug preventing for this specific implementation however.
+    // Should use OneToOne in theory however there is a bug preventing for this specific implementation
     @OneToMany(mappedBy = "card")
     private List<Deck> deckList;
 
     @ManyToOne
-    @JoinColumn(name="name", referencedColumnName="name", insertable=false, updatable=false)
+    @JoinColumn(name = "name", referencedColumnName = "name", insertable = false, updatable = false)
     private Value value;
 
-    protected Card() {}
+    protected Card() {
+    }
 
     public Card(UUID uuid, String name, String suit, Long deckNumber) {
         setUUID(uuid);

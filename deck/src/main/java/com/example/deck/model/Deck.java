@@ -1,4 +1,4 @@
-package com.example.deck;
+package com.example.deck.model;
 
 import javax.persistence.*;
 import java.util.UUID;
