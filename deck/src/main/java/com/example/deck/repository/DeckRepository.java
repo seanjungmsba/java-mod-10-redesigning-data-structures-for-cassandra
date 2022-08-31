@@ -6,5 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.Optional;
 
 public interface DeckRepository extends CrudRepository<Deck, Long> {
+    Optional<Deck> findByPosition(Long position);
     Optional<Deck> findFirstByOrderByPositionDesc();
+    Deck findFirstByPositionIsNotNullOrderByPosition();
 }
