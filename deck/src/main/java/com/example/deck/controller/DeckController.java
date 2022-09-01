@@ -19,7 +19,8 @@ import static java.util.UUID.randomUUID;
 @RestController
 public class DeckController {
 
-    private Long positionCounter = 1L;
+    // posCounter keeps track of position of the deck
+    private Long posCounter = 1L;
 
     @Autowired
     private DeckRepository deckRepository;
@@ -33,15 +34,16 @@ public class DeckController {
     @Autowired
     private ValueService valueService;
 
+    /* A. NEW endpoint */
     @GetMapping("/new")
     public String newDeck(@RequestParam(value = "decks", defaultValue = "1") Long decks) {
 
-        // Drop tables and start new
+        // A1. drop tables and start new deck
         deckRepository.deleteAll();
         cardRepository.deleteAll();
         valueRepository.deleteAll();
 
-        // Initialize values table
+        // A2. initialize values table
         valueRepository.save(new Value("Two", 2L));
         valueRepository.save(new Value("Three", 3L));
         valueRepository.save(new Value("Four", 4L));
@@ -56,11 +58,12 @@ public class DeckController {
         valueRepository.save(new Value("King", 10L));
         valueRepository.save(new Value("Ace", 11L));
 
-        // Initialize card table
+        // A3. initialize card table
         List<String> suits = Arrays.asList("Clubs", "Hearts", "Spades", "Diamonds");
         List<String> names = Arrays.asList("Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
                 "Nine", "Ten", "Jack", "Queen", "King", "Ace");
 
+        // A4. nested for-loops to define cards
         for (Long deck = 1L; deck <= decks; deck++) {
             for (String suit : suits) {
                 for (String name : names) {
@@ -73,7 +76,7 @@ public class DeckController {
             }
         }
 
-        // Initialize deck table
+        // A5. initialize deck table
         Long position = 1L;
         Iterable<Card> cards = cardRepository.findAll();
         for (Card card : cards) {
@@ -81,38 +84,52 @@ public class DeckController {
             deckRepository.save(deckItem);
             position++;
         }
+
+        // A6. return decks
         return String.format("New Deck using %s decks.", decks);
     }
 
+    /* B. SHUFFLE endpoint */
     @GetMapping("/shuffle")
     public String shuffleDeck() {
 
-        // Read order of cards
+        // B1. read order of cards
         Iterable<Deck> deck = deckRepository.findAll();
         List<Long> order = new ArrayList<Long>();
         for (Deck deckItem : deck) {
             order.add(deckItem.getPosition());
         }
 
-        // Shuffle order
+        // B2. shuffle order
         Collections.shuffle(order);
 
-        // Write new order of cards
+        // B3. write new order of cards
         ListIterator<Long> orderItr = order.listIterator();
         for (Deck deckItem : deck) {
             deckItem.setPosition(orderItr.next());
             deckRepository.save(deckItem);
         }
+
+        // B4. position counter reset
+        posCounter = 1L;
+
+        // B5. return status
         return "Deck shuffled.";
     }
 
+    /* C. DEAL endpoint */
     @GetMapping("/deal")
     public String dealCard() {
 
-        Deck deckItem = deckRepository.findByPosition(positionCounter++).orElseGet(null);
+        // C1. deal the card that is on the current position (make sure to increment the index afterwards)
+        Deck deckItem = deckRepository.findByPosition(posCounter++).orElseGet(null);
+
+        // C2. delete deck from repository
         deckRepository.delete(deckItem);
 
-        return String.format("Dealt %s of %s: Worth %s points.", deckItem.getCardName(),
+        // C3. return card info
+        return String.format("Dealt %s of %s: Worth %s points.",
+                deckItem.getCardName(),
                 deckItem.getSuit(),
                 deckItem.getPoints());
     }
